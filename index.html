@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schneeschippen Planer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>❄️ Schneeschippen Planer</h1>
+            <p class="subtitle">Turnus-basierte Planung</p>
+        </header>
+
+        <main>
+            <!-- Current Turn Section -->
+            <section class="current-turn">
+                <h2>Aktuell dran</h2>
+                <div id="current-person" class="current-person">
+                    <span class="person-name">-</span>
+                </div>
+                <button id="mark-done-btn" class="btn btn-primary" disabled>Ich habe geschippt ✓</button>
+            </section>
+
+            <!-- People Management Section -->
+            <section class="people-section">
+                <h2>Personen</h2>
+                <div class="add-person">
+                    <input type="text" id="new-person-input" placeholder="Name hinzufügen..." maxlength="30">
+                    <button id="add-person-btn" class="btn btn-secondary">Hinzufügen</button>
+                </div>
+                <ul id="people-list" class="people-list"></ul>
+            </section>
+
+            <!-- Backup Section -->
+            <section class="backup-section">
+                <h2>Nicht verfügbar?</h2>
+                <p class="info-text">Wenn jemand krank ist oder im Urlaub, kann diese Person übersprungen werden.</p>
+                <button id="skip-current-btn" class="btn btn-warning" disabled>Nächste Person</button>
+            </section>
+
+            <!-- Turn History -->
+            <section class="history-section">
+                <h2>Letzte Schippeinsätze</h2>
+                <ul id="history-list" class="history-list"></ul>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
