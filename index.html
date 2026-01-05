@@ -23,23 +23,6 @@
                 <button id="mark-done-btn" class="btn btn-primary" disabled>Ich habe geschippt ✓</button>
             </section>
 
-            <!-- People Management Section -->
-            <section class="people-section">
-                <div class="section-header">
-                    <h2>Personen</h2>
-                    <button id="toggle-add-person" class="toggle-btn" aria-label="Personen hinzufügen">
-                        <span class="toggle-icon">+</span>
-                    </button>
-                </div>
-                <div id="add-person-container" class="add-person-container collapsed">
-                    <div class="add-person">
-                        <input type="text" id="new-person-input" placeholder="Name hinzufügen..." maxlength="30">
-                        <button id="add-person-btn" class="btn btn-secondary">Hinzufügen</button>
-                    </div>
-                </div>
-                <ul id="people-list" class="people-list"></ul>
-            </section>
-
             <!-- Backup Section -->
             <section class="backup-section">
                 <h2>Nicht verfügbar?</h2>
@@ -68,8 +51,28 @@
                     </button>
                 </div>
                 <div id="settings-container" class="settings-container collapsed">
-                    <p class="info-text warning-text">⚠️ Vorsicht: Diese Aktion kann nicht rückgängig gemacht werden!</p>
-                    <button id="clear-data-btn" class="btn btn-danger">Alle Daten löschen</button>
+                    <!-- People Management inside Settings -->
+                    <div class="settings-subsection">
+                        <div class="section-header">
+                            <h3>Personen</h3>
+                            <button id="toggle-add-person" class="toggle-btn" aria-label="Personen hinzufügen">
+                                <span class="toggle-icon">+</span>
+                            </button>
+                        </div>
+                        <div id="add-person-container" class="add-person-container collapsed">
+                            <div class="add-person">
+                                <input type="text" id="new-person-input" placeholder="Name hinzufügen..." maxlength="30">
+                                <button id="add-person-btn" class="btn btn-secondary">Hinzufügen</button>
+                            </div>
+                        </div>
+                        <ul id="people-list" class="people-list"></ul>
+                    </div>
+
+                    <!-- Clear Data -->
+                    <div class="settings-subsection">
+                        <p class="info-text warning-text">⚠️ Vorsicht: Diese Aktion kann nicht rückgängig gemacht werden!</p>
+                        <button id="clear-data-btn" class="btn btn-danger">Alle Daten löschen</button>
+                    </div>
                 </div>
             </section>
         </main>

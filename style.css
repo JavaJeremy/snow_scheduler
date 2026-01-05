@@ -368,7 +368,7 @@ section h2 {
 .settings-container {
     overflow: hidden;
     transition: max-height 0.3s ease, margin 0.3s ease, opacity 0.3s ease;
-    max-height: 200px;
+    max-height: 1000px;
     opacity: 1;
     margin-bottom: 0;
 }
@@ -377,6 +377,25 @@ section h2 {
     max-height: 0;
     margin-bottom: 0;
     opacity: 0;
+}
+
+.settings-subsection {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-subsection:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-subsection h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0;
+    color: var(--text-primary);
 }
 
 .warning-text {
