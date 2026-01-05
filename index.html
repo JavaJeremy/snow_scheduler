@@ -25,10 +25,17 @@
 
             <!-- People Management Section -->
             <section class="people-section">
-                <h2>Personen</h2>
-                <div class="add-person">
-                    <input type="text" id="new-person-input" placeholder="Name hinzufügen..." maxlength="30">
-                    <button id="add-person-btn" class="btn btn-secondary">Hinzufügen</button>
+                <div class="section-header">
+                    <h2>Personen</h2>
+                    <button id="toggle-add-person" class="toggle-btn" aria-label="Personen hinzufügen">
+                        <span class="toggle-icon">+</span>
+                    </button>
+                </div>
+                <div id="add-person-container" class="add-person-container collapsed">
+                    <div class="add-person">
+                        <input type="text" id="new-person-input" placeholder="Name hinzufügen..." maxlength="30">
+                        <button id="add-person-btn" class="btn btn-secondary">Hinzufügen</button>
+                    </div>
                 </div>
                 <ul id="people-list" class="people-list"></ul>
             </section>
@@ -40,10 +47,30 @@
                 <button id="skip-current-btn" class="btn btn-warning" disabled>Nächste Person</button>
             </section>
 
+            <!-- Statistics Section -->
+            <section class="statistics-section">
+                <h2>Statistik</h2>
+                <div id="statistics-content" class="statistics-content"></div>
+            </section>
+
             <!-- Turn History -->
             <section class="history-section">
                 <h2>Letzte Schippeinsätze</h2>
                 <ul id="history-list" class="history-list"></ul>
+            </section>
+
+            <!-- Settings Section -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <h2>Einstellungen</h2>
+                    <button id="toggle-settings" class="toggle-btn" aria-label="Einstellungen anzeigen">
+                        <span class="toggle-icon">+</span>
+                    </button>
+                </div>
+                <div id="settings-container" class="settings-container collapsed">
+                    <p class="info-text warning-text">⚠️ Vorsicht: Diese Aktion kann nicht rückgängig gemacht werden!</p>
+                    <button id="clear-data-btn" class="btn btn-danger">Alle Daten löschen</button>
+                </div>
             </section>
         </main>
     </div>

@@ -33,6 +33,12 @@ const newPersonInput = document.getElementById('new-person-input');
 const addPersonBtn = document.getElementById('add-person-btn');
 const peopleListEl = document.getElementById('people-list');
 const historyListEl = document.getElementById('history-list');
+const statisticsContent = document.getElementById('statistics-content');
+const toggleAddPersonBtn = document.getElementById('toggle-add-person');
+const addPersonContainer = document.getElementById('add-person-container');
+const toggleSettingsBtn = document.getElementById('toggle-settings');
+const settingsContainer = document.getElementById('settings-container');
+const clearDataBtn = document.getElementById('clear-data-btn');
 
 // Update current person display
 function updateCurrentPerson() {
@@ -76,6 +82,74 @@ function renderPeopleList() {
         });
 
         peopleListEl.appendChild(li);
+    });
+}
+
+// Calculate statistics
+function calculateStatistics() {
+    const stats = {};
+    
+    // Count occurrences for each person
+    data.history.forEach(entry => {
+        if (!stats[entry.person]) {
+            stats[entry.person] = 0;
+        }
+        stats[entry.person]++;
+    });
+
+    // Also include people who haven't done it yet (0 times)
+    data.people.forEach(person => {
+        if (!stats[person]) {
+            stats[person] = 0;
+        }
+    });
+
+    return stats;
+}
+
+// Render statistics
+function renderStatistics() {
+    statisticsContent.innerHTML = '';
+
+    if (data.history.length === 0 && data.people.length === 0) {
+        statisticsContent.innerHTML = '<div class="empty-state">Noch keine Daten</div>';
+        return;
+    }
+
+    const stats = calculateStatistics();
+    const totalShovels = data.history.length;
+
+    // Sort by count (descending), then by name
+    const sortedStats = Object.entries(stats)
+        .sort((a, b) => {
+            if (b[1] !== a[1]) return b[1] - a[1];
+            return a[0].localeCompare(b[0]);
+        });
+
+    if (sortedStats.length === 0) {
+        statisticsContent.innerHTML = '<div class="empty-state">Noch keine Daten</div>';
+        return;
+    }
+
+    sortedStats.forEach(([person, count]) => {
+        const statItem = document.createElement('div');
+        statItem.className = 'stat-item';
+
+        const percentage = totalShovels > 0 ? Math.round((count / totalShovels) * 100) : 0;
+        const barWidth = totalShovels > 0 ? (count / Math.max(...Object.values(stats))) * 100 : 0;
+
+        statItem.innerHTML = `
+            <div class="stat-person">
+                <span class="stat-name">${person}</span>
+                <span class="stat-count">${count}x</span>
+            </div>
+            <div class="stat-bar-container">
+                <div class="stat-bar" style="width: ${barWidth}%"></div>
+            </div>
+            <div class="stat-percentage">${percentage}%</div>
+        `;
+
+        statisticsContent.appendChild(statItem);
     });
 }
 
@@ -123,6 +197,7 @@ function addPerson() {
     saveData();
     renderPeopleList();
     updateCurrentPerson();
+    renderStatistics();
 }
 
 // Delete person
@@ -143,6 +218,7 @@ function deletePerson(index) {
     saveData();
     renderPeopleList();
     updateCurrentPerson();
+    renderStatistics();
 }
 
 // Mark as done
@@ -166,6 +242,7 @@ function markAsDone() {
     saveData();
     updateCurrentPerson();
     renderHistory();
+    renderStatistics();
 
     // Show confirmation
     markDoneBtn.textContent = '✓ Erledigt!';
@@ -187,6 +264,48 @@ function skipCurrent() {
     updateCurrentPerson();
 }
 
+// Clear all data
+function clearAllData() {
+    const confirmed = confirm('⚠️ WARNUNG: Möchten Sie wirklich alle Daten löschen?\n\nDies schließt ein:\n- Alle Personen\n- Die gesamte Historie\n- Die Statistik\n\nDiese Aktion kann nicht rückgängig gemacht werden!');
+    
+    if (confirmed) {
+        // Double confirmation
+        const doubleConfirm = confirm('Letzte Bestätigung: Sind Sie sicher, dass Sie ALLE Daten unwiderruflich löschen möchten?');
+        
+        if (doubleConfirm) {
+            data = {
+                people: [],
+                currentIndex: 0,
+                history: []
+            };
+            saveData();
+            renderPeopleList();
+            updateCurrentPerson();
+            renderHistory();
+            renderStatistics();
+            
+            // Close settings after clearing
+            settingsContainer.classList.add('collapsed');
+            const icon = toggleSettingsBtn.querySelector('.toggle-icon');
+            icon.textContent = '+';
+        }
+    }
+}
+
+// Toggle add person section
+toggleAddPersonBtn.addEventListener('click', () => {
+    addPersonContainer.classList.toggle('collapsed');
+    const icon = toggleAddPersonBtn.querySelector('.toggle-icon');
+    icon.textContent = addPersonContainer.classList.contains('collapsed') ? '+' : '−';
+});
+
+// Toggle settings section
+toggleSettingsBtn.addEventListener('click', () => {
+    settingsContainer.classList.toggle('collapsed');
+    const icon = toggleSettingsBtn.querySelector('.toggle-icon');
+    icon.textContent = settingsContainer.classList.contains('collapsed') ? '+' : '−';
+});
+
 // Event listeners
 addPersonBtn.addEventListener('click', addPerson);
 
@@ -198,9 +317,11 @@ newPersonInput.addEventListener('keypress', (e) => {
 
 markDoneBtn.addEventListener('click', markAsDone);
 skipCurrentBtn.addEventListener('click', skipCurrent);
+clearDataBtn.addEventListener('click', clearAllData);
 
 // Initial render
 renderPeopleList();
 updateCurrentPerson();
 renderHistory();
+renderStatistics();
 
