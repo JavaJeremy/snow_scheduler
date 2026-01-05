@@ -18,7 +18,13 @@
             <div id="sync-status" class="sync-status"></div>
         </header>
 
-        <main>
+        <!-- Loading Indicator -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Verbindung zur Cloud wird hergestellt...</p>
+        </div>
+
+        <main id="main-content" class="hidden">
             <!-- Current Turn Section -->
             <section class="current-turn">
                 <h2>Aktuell dran</h2>

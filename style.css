@@ -28,6 +28,21 @@ body {
     line-height: 1.6;
     padding: 1rem;
     min-height: 100vh;
+    position: relative;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#main-content {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+#main-content.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 .container {
@@ -75,6 +90,48 @@ header h1 {
 .sync-status.sync-error {
     background: rgba(239, 68, 68, 0.1);
     color: #ef4444;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1.5rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-align: center;
 }
 
 section {

@@ -10,6 +10,7 @@ let db = null;
 let auth = null;
 let isUsingFirebase = false;
 let syncStatusEl = null;
+let isLoading = true;
 
 // Authenticate with Firebase (Anonymous Authentication)
 async function authenticateUser() {
@@ -37,12 +38,14 @@ async function authenticateUser() {
 // Initialize Firebase if configured
 async function initFirebase() {
     if (typeof FIREBASE_CONFIG !== 'undefined' && USE_FIREBASE && FIREBASE_CONFIG.apiKey) {
+        showLoading('Verbindung zur Cloud wird hergestellt...');
         try {
             firebase.initializeApp(FIREBASE_CONFIG);
             auth = firebase.auth();
             db = firebase.firestore();
             
             // Authenticate user (anonymous)
+            showLoading('Authentifizierung läuft...');
             const authSuccess = await authenticateUser();
             if (authSuccess) {
                 isUsingFirebase = true;
@@ -59,8 +62,40 @@ async function initFirebase() {
             return false;
         }
     }
+    // No Firebase - hide loading immediately for localStorage
     updateSyncStatus('local', 'Nur lokal gespeichert');
     return false;
+}
+
+// Show/hide loading overlay
+function showLoading(message = 'Verbindung zur Cloud wird hergestellt...') {
+    const overlay = document.getElementById('loading-overlay');
+    const mainContent = document.getElementById('main-content');
+    const loadingText = overlay?.querySelector('.loading-text');
+    
+    if (overlay) {
+        overlay.classList.remove('hidden');
+        if (loadingText) {
+            loadingText.textContent = message;
+        }
+    }
+    if (mainContent) {
+        mainContent.classList.add('hidden');
+    }
+    isLoading = true;
+}
+
+function hideLoading() {
+    const overlay = document.getElementById('loading-overlay');
+    const mainContent = document.getElementById('main-content');
+    
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+    if (mainContent) {
+        mainContent.classList.remove('hidden');
+    }
+    isLoading = false;
 }
 
 // Update sync status indicator
@@ -77,6 +112,7 @@ function updateSyncStatus(status, message) {
 // Load data from Firebase or localStorage
 async function loadData() {
     if (isUsingFirebase && db && auth && auth.currentUser) {
+        showLoading('Daten werden geladen...');
         try {
             const doc = await db.collection(COLLECTION_NAME).doc(DOCUMENT_ID).get();
             if (doc.exists) {
@@ -97,6 +133,7 @@ async function loadData() {
             loadFromLocalStorage();
         }
     } else {
+        // Quick load from localStorage (no loading needed, but show briefly for consistency)
         loadFromLocalStorage();
     }
 }
@@ -156,15 +193,23 @@ function setupRealtimeListener() {
 
 // Initialize Firebase, authenticate, load data and render
 (async function init() {
+    // Show loading initially
+    showLoading('Initialisierung...');
+    
     await initFirebase();
     await loadData();
+    
     // Initial render after data is loaded
     renderPeopleList();
     updateCurrentPerson();
     renderHistory();
     renderStatistics();
+    
     // Setup real-time sync
     setupRealtimeListener();
+    
+    // Hide loading and show content
+    hideLoading();
 })();
 
 // DOM elements
