@@ -36,12 +36,28 @@ Ein einfacher, turnus-basierter Planer für das Schneeschippen, optimiert für m
 
 ## Datenspeicherung
 
-Die Daten werden im Browser (LocalStorage) gespeichert und bleiben auch nach dem Schließen des Browsers erhalten. **Wichtig**: Die Daten sind nur auf dem jeweiligen Gerät/Browser verfügbar. Für eine geräteübergreifende Synchronisation wäre ein Backend-Service erforderlich (nicht möglich mit reinem GitHub Pages).
+### Standard (LocalStorage)
+Die Daten werden standardmäßig im Browser (LocalStorage) gespeichert und bleiben auch nach dem Schließen des Browsers erhalten. **Wichtig**: Die Daten sind nur auf dem jeweiligen Gerät/Browser verfügbar.
+
+### Cross-Device Sync mit Firebase (Optional)
+Für eine geräteübergreifende Synchronisation können Sie Firebase Firestore einrichten. Die App funktioniert dann auf allen Geräten mit den gleichen Daten in Echtzeit.
+
+**Setup**: Siehe [FIREBASE_SETUP.md](FIREBASE_SETUP.md) für eine detaillierte Anleitung.
+
+Kurzfassung:
+1. Firebase-Projekt erstellen auf [console.firebase.google.com](https://console.firebase.google.com/)
+2. Firestore Database aktivieren
+3. Web-App hinzufügen und Config kopieren
+4. Config in `firebase-config.js` einfügen und `USE_FIREBASE = true` setzen
+
+Firebase hat einen kostenlosen Plan, der für den normalen Gebrauch völlig ausreicht!
 
 ## Technische Details
 
-- Reine HTML/CSS/JavaScript (keine Dependencies)
-- LocalStorage für Datenspeicherung
+- Reine HTML/CSS/JavaScript
+- LocalStorage für lokale Datenspeicherung (Standard)
+- Firebase Firestore für Cross-Device Sync (optional)
 - Responsive Design mit Mobile-First Ansatz
 - Touch-optimierte Buttons (min. 44px Höhe)
+- Echtzeit-Synchronisation bei aktiviertem Firebase
 

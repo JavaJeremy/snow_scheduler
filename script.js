@@ -5,8 +5,104 @@ let data = {
     history: []
 };
 
-// Load data from localStorage
-function loadData() {
+// Firebase/Firestore setup
+let db = null;
+let auth = null;
+let isUsingFirebase = false;
+let syncStatusEl = null;
+
+// Authenticate with Firebase (Anonymous Authentication)
+async function authenticateUser() {
+    if (!auth) return false;
+    
+    try {
+        // Check if user is already signed in
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+            console.log('User already authenticated:', currentUser.uid);
+            return true;
+        }
+        
+        // Sign in anonymously
+        const userCredential = await auth.signInAnonymously();
+        console.log('Anonymous authentication successful:', userCredential.user.uid);
+        return true;
+    } catch (error) {
+        console.error('Authentication error:', error);
+        updateSyncStatus('error', 'Authentifizierung fehlgeschlagen');
+        return false;
+    }
+}
+
+// Initialize Firebase if configured
+async function initFirebase() {
+    if (typeof FIREBASE_CONFIG !== 'undefined' && USE_FIREBASE && FIREBASE_CONFIG.apiKey) {
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            auth = firebase.auth();
+            db = firebase.firestore();
+            
+            // Authenticate user (anonymous)
+            const authSuccess = await authenticateUser();
+            if (authSuccess) {
+                isUsingFirebase = true;
+                updateSyncStatus('connected', 'Mit Cloud verbunden');
+                console.log('Firebase initialized successfully');
+                return true;
+            } else {
+                updateSyncStatus('error', 'Authentifizierung fehlgeschlagen');
+                return false;
+            }
+        } catch (e) {
+            console.error('Firebase initialization error:', e);
+            updateSyncStatus('error', 'Cloud-Verbindung fehlgeschlagen');
+            return false;
+        }
+    }
+    updateSyncStatus('local', 'Nur lokal gespeichert');
+    return false;
+}
+
+// Update sync status indicator
+function updateSyncStatus(status, message) {
+    if (!syncStatusEl) {
+        syncStatusEl = document.getElementById('sync-status');
+    }
+    if (!syncStatusEl) return;
+    
+    syncStatusEl.className = `sync-status sync-${status}`;
+    syncStatusEl.textContent = message;
+}
+
+// Load data from Firebase or localStorage
+async function loadData() {
+    if (isUsingFirebase && db && auth && auth.currentUser) {
+        try {
+            const doc = await db.collection(COLLECTION_NAME).doc(DOCUMENT_ID).get();
+            if (doc.exists) {
+                data = doc.data();
+                updateSyncStatus('connected', 'Mit Cloud verbunden');
+            } else {
+                // No data in Firestore, try localStorage as fallback
+                loadFromLocalStorage();
+                // Save to Firestore if we have local data
+                if (data.people.length > 0 || data.history.length > 0) {
+                    await saveData();
+                }
+            }
+        } catch (e) {
+            console.error('Error loading from Firebase:', e);
+            updateSyncStatus('error', 'Fehler beim Laden');
+            // Fallback to localStorage
+            loadFromLocalStorage();
+        }
+    } else {
+        loadFromLocalStorage();
+    }
+}
+
+// Load from localStorage
+function loadFromLocalStorage() {
     const saved = localStorage.getItem('snowSchedulerData');
     if (saved) {
         try {
@@ -17,13 +113,59 @@ function loadData() {
     }
 }
 
-// Save data to localStorage
-function saveData() {
+// Save data to Firebase and/or localStorage
+async function saveData() {
+    // Always save to localStorage as backup
     localStorage.setItem('snowSchedulerData', JSON.stringify(data));
+    
+    // Also save to Firebase if enabled and authenticated
+    if (isUsingFirebase && db && auth && auth.currentUser) {
+        try {
+            await db.collection(COLLECTION_NAME).doc(DOCUMENT_ID).set(data);
+            updateSyncStatus('connected', 'Mit Cloud verbunden');
+        } catch (e) {
+            console.error('Error saving to Firebase:', e);
+            updateSyncStatus('error', 'Fehler beim Speichern');
+        }
+    }
 }
 
-// Initialize
-loadData();
+// Setup real-time listener for Firebase
+function setupRealtimeListener() {
+    if (isUsingFirebase && db && auth && auth.currentUser) {
+        db.collection(COLLECTION_NAME).doc(DOCUMENT_ID)
+            .onSnapshot((doc) => {
+                if (doc.exists) {
+                    const newData = doc.data();
+                    // Only update if data actually changed (avoid infinite loops)
+                    if (JSON.stringify(newData) !== JSON.stringify(data)) {
+                        data = newData;
+                        renderPeopleList();
+                        updateCurrentPerson();
+                        renderHistory();
+                        renderStatistics();
+                        updateSyncStatus('connected', 'Mit Cloud verbunden');
+                    }
+                }
+            }, (error) => {
+                console.error('Firebase listener error:', error);
+                updateSyncStatus('error', 'Sync-Fehler');
+            });
+    }
+}
+
+// Initialize Firebase, authenticate, load data and render
+(async function init() {
+    await initFirebase();
+    await loadData();
+    // Initial render after data is loaded
+    renderPeopleList();
+    updateCurrentPerson();
+    renderHistory();
+    renderStatistics();
+    // Setup real-time sync
+    setupRealtimeListener();
+})();
 
 // DOM elements
 const currentPersonEl = document.getElementById('current-person');
@@ -319,9 +461,9 @@ markDoneBtn.addEventListener('click', markAsDone);
 skipCurrentBtn.addEventListener('click', skipCurrent);
 clearDataBtn.addEventListener('click', clearAllData);
 
-// Initial render
-renderPeopleList();
-updateCurrentPerson();
-renderHistory();
-renderStatistics();
+// Initial render (will be called after loadData completes)
+// renderPeopleList();
+// updateCurrentPerson();
+// renderHistory();
+// renderStatistics();
 

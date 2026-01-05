@@ -53,6 +53,30 @@ header h1 {
     font-size: 0.9rem;
 }
 
+.sync-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    margin-top: 0.5rem;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.sync-status.sync-connected {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--success-color);
+}
+
+.sync-status.sync-local {
+    background: rgba(100, 116, 139, 0.1);
+    color: var(--text-secondary);
+}
+
+.sync-status.sync-error {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
 section {
     background: var(--card-background);
     border-radius: 12px;
